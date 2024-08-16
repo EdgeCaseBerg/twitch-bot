@@ -17,6 +17,6 @@ public class BiblicalChatCellRenderer extends ChatMemberCellRenderer {
     @Override
     protected String formatChatMessage(ChatMessage chatMessage) {
         float bibleScore = biblicalCalculator.calculateScore(chatMessage.chatMessage());
-        return "<html><body style='width: %spx'>[Biblicality: %s] %s: %s</body></html>".formatted(width - fontSize, bibleScore, chatMessage.username(), chatMessage.chatMessage());
+        return "<html><body style='width: %spx'>[Biblicality: %.2f] %s: %s</body></html>".formatted(width - fontSize, bibleScore, chatMessage.username(), chatMessage.chatMessage());
     }
 }

@@ -5,15 +5,19 @@ import space.peetseater.bot.ChatMessage;
 import space.peetseater.bot.EventListener;
 
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.ForkJoinPool;
 
 public class OBSRewardListener implements EventListener {
 
     private final OBSRemoteController obsRemoteController;
     HashMap<String, OBSTask> rewardTasks;
+    ExecutorService executorService;
 
     public OBSRewardListener(OBSRemoteController obsRemoteController) {
         rewardTasks = new HashMap<String, OBSTask>();
         this.obsRemoteController = obsRemoteController;
+        executorService = new ForkJoinPool();
         setupTasks();
     }
 
@@ -31,7 +35,12 @@ public class OBSRewardListener implements EventListener {
         if (hasTaskFor(reward)) {
             OBSTask task = rewardTasks.get(reward);
             if (!task.isBusy()) {
-                task.run(obsRemoteController);
+                executorService.submit(new Runnable() {
+                    @Override
+                    public void run() {
+                        task.run(obsRemoteController);
+                    }
+                });
             }
         }
     }

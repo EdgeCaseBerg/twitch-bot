@@ -10,11 +10,11 @@ import java.util.List;
 
 public class ChatMemberCellRenderer implements javax.swing.ListCellRenderer<ChatMessage> {
 
-    private final int width;
-    private int colorIdx = 0;
-    private final List<Color> chatColors;
-    private final HashMap<String, Color> chatMemberToColor;
-    private int fontSize;
+    protected final int width;
+    protected int colorIdx = 0;
+    protected final List<Color> chatColors;
+    protected final HashMap<String, Color> chatMemberToColor;
+    protected int fontSize;
 
     public ChatMemberCellRenderer(int width, int fontSize) {
         chatMemberToColor = new HashMap<>();

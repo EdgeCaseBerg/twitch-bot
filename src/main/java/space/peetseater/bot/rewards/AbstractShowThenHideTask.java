@@ -5,7 +5,6 @@ import io.obswebsocket.community.client.message.response.sceneitems.GetSceneItem
 import io.obswebsocket.community.client.message.response.sceneitems.GetSceneItemIdResponse;
 import io.obswebsocket.community.client.message.response.scenes.GetSceneListResponse;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 
 public abstract class AbstractShowThenHideTask implements OBSTask {

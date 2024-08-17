@@ -16,7 +16,7 @@ public class BestGirlVotesDB {
 
     public void loadScore(Path path) throws IOException {
         String data = Files.readString(path, StandardCharsets.UTF_8);
-        StringTokenizer tokenizer = new StringTokenizer(data, "||\n", false);
+        StringTokenizer tokenizer = new StringTokenizer(data, "|\n", false);
         assert (tokenizer.countTokens() % 2 == 0);
         while (tokenizer.hasMoreTokens()) {
             String name = tokenizer.nextToken();
@@ -52,5 +52,16 @@ public class BestGirlVotesDB {
 
     public int getScore(String characterName) {
         return score.getOrDefault(characterName, 0);
+    }
+
+    @Override
+    public String toString() {
+        Iterator<Map.Entry<String, Integer>> entries = score.entrySet().iterator();
+        StringBuilder stringBuilder = new StringBuilder();
+        while(entries.hasNext()) {
+            Map.Entry<String, Integer> entry = entries.next();
+            stringBuilder.append(entry.getKey()).append(":").append(entry.getValue());
+        }
+        return stringBuilder.toString();
     }
 }

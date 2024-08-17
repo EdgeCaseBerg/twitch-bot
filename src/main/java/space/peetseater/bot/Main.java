@@ -1,7 +1,6 @@
 package space.peetseater.bot;
 
 import io.obswebsocket.community.client.OBSRemoteController;
-import io.obswebsocket.community.client.WebSocketCloseCode;
 import space.peetseater.bot.gui.ChatWindow;
 import space.peetseater.bot.rewards.BestGirlVotesDB;
 import space.peetseater.bot.rewards.OBSRewardListener;
@@ -12,7 +11,6 @@ import java.nio.file.Files;
 import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.function.Consumer;
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -47,18 +45,16 @@ public class Main {
             twitchEventPublisher.addListener(chatWindow);
         });
 
-        Runtime.getRuntime().addShutdownHook(new Thread() {
-            public void run() {
-                twitchEventPublisher.disconnectFromTwitch();
-                obs.disconnect();
-                try {
-                    bestGirlVotesDB.saveScore(bestGirlData);
-                } catch (IOException e) {
-                    System.out.println("Could not save best girl votes!" + bestGirlVotesDB.toString());
-                    throw new RuntimeException(e);
-                }
+        Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            twitchEventPublisher.disconnectFromTwitch();
+            obs.disconnect();
+            try {
+                bestGirlVotesDB.saveScore(bestGirlData);
+            } catch (IOException e) {
+                System.out.printf("Could not save best girl votes! %s%n", bestGirlVotesDB);
+                throw new RuntimeException(e);
             }
-        });
+        }));
     }
 
     private static OBSRemoteController getObsRemoteController(String ipAddress, String password) {
@@ -68,30 +64,22 @@ public class Main {
                 .port(4455)
                 .password(password)
                 .lifecycle()
-                .onReady(new Runnable() {
-                    @Override
-                    public void run() {
-                        System.out.println("OBS is ready!");
-                    }
-                })
-                .onClose(new Consumer<WebSocketCloseCode>() {
-                    @Override
-                    public void accept(WebSocketCloseCode webSocketCloseCode) {
-                        // TODO: Remove event handler for rewards when obs connection is closed?
-                    }
+                .onReady(() -> System.out.println("OBS is ready!"))
+                .onClose(webSocketCloseCode -> {
+                    // TODO: Remove event handler for rewards when obs connection is closed?
                 })
                 .and()
-
                 .connectionTimeout(4).build();
     }
 
+    // Handy method for testing Swing window without needing to connect to twitch :P
     private void localTestChatWindow(ChatWindow chatWindow) {
-        String bigString = "";
+        StringBuilder bigString = new StringBuilder();
         for (int i = 0; i < 5; i++) {
             chatWindow.onChatMessage(new ChatMessage("Some text", "Chat Member1"));
             chatWindow.onChatMessage(new ChatMessage("Some more text", "Chat Member2"));
             chatWindow.onChatMessage(new ChatMessage("Some text more", "Chat Member3"));
-            bigString += "a word and " + i;
+            bigString.append("a word and ").append(i);
         }
         chatWindow.onChatMessage(new ChatMessage("Some text", "Chat Member1"));
         chatWindow.onChatMessage(new ChatMessage("Some more text", "Chat Member2"));
@@ -102,7 +90,7 @@ public class Main {
         } catch (InterruptedException e) {
             throw new RuntimeException(e);
         }
-        chatWindow.onChatMessage(new ChatMessage("%s".formatted(bigString), "Chat Member4"));
+        chatWindow.onChatMessage(new ChatMessage("%s".formatted(bigString.toString()), "Chat Member4"));
     }
 
     public static String getClientID(String[] args) throws IOException {

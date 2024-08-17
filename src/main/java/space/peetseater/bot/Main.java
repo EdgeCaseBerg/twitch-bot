@@ -1,35 +1,71 @@
 package space.peetseater.bot;
 
+import io.obswebsocket.community.client.OBSRemoteController;
+import io.obswebsocket.community.client.WebSocketCloseCode;
 import space.peetseater.bot.gui.ChatWindow;
+import space.peetseater.bot.rewards.OBSRewardListener;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.function.Consumer;
 
 public class Main {
     public static void main(String[] args) throws IOException {
         String clientId = getClientID(args);
         String clientSecret = getClientSecret(args);
         String channelName = getChannelName(args);
+        String ipAddress = getIpAddress(args);
+        String obsPassword = getObsPassword(args);
+
+        OBSRemoteController obs = getObsRemoteController(ipAddress,obsPassword);
+        obs.connect();
+        OBSRewardListener obsRewardListener = new OBSRewardListener(obs);
 
         // Setup Twitch Connection
         TwitchEventPublisher twitchEventPublisher = new TwitchEventPublisher(clientId, clientSecret);
         twitchEventPublisher.connectToTwitch();
         twitchEventPublisher.beginListeningForRewards(channelName);
         twitchEventPublisher.beginListeningForChatMessages(channelName);
+        twitchEventPublisher.addListener(obsRewardListener);
 
         // Setup Bible Chat Window
         SwingUtilities.invokeLater(() -> {
             ChatWindow chatWindow = new ChatWindow();
             twitchEventPublisher.addListener(chatWindow);
         });
-//
+
         Runtime.getRuntime().addShutdownHook(new Thread() {
             public void run() {
                 twitchEventPublisher.disconnectFromTwitch();
+                obs.disconnect();
             }
         });
+    }
+
+    private static OBSRemoteController getObsRemoteController(String ipAddress, String password) {
+        return OBSRemoteController.builder()
+                .autoConnect(false)
+                .host(ipAddress)
+                .port(4455)
+                .password(password)
+                .lifecycle()
+                .onReady(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("OBS is ready!");
+                    }
+                })
+                .onClose(new Consumer<WebSocketCloseCode>() {
+                    @Override
+                    public void accept(WebSocketCloseCode webSocketCloseCode) {
+                        // TODO: Remove event handler for rewards when obs connection is closed?
+                    }
+                })
+                .and()
+
+                .connectionTimeout(4).build();
     }
 
     private void localTestChatWindow(ChatWindow chatWindow) {
@@ -52,13 +88,6 @@ public class Main {
         chatWindow.onChatMessage(new ChatMessage("%s".formatted(bigString), "Chat Member4"));
     }
 
-    private static String getChannelName(String[] args) {
-        if (args.length < 3) {
-            throw new IllegalArgumentException("Pass channel as 3rd argument");
-        }
-        return args[2];
-    }
-
     public static String getClientID(String[] args) throws IOException {
         if (args.length < 1) {
             throw new IllegalArgumentException("Pass file with oauth token for twitch");
@@ -71,6 +100,27 @@ public class Main {
             throw new IllegalArgumentException("Pass file with oauth token for twitch");
         }
         return Files.readString(Paths.get(args[1]));
+    }
+
+    private static String getChannelName(String[] args) {
+        if (args.length < 3) {
+            throw new IllegalArgumentException("Pass channel as 3rd argument");
+        }
+        return args[2];
+    }
+
+    private static String getIpAddress(String[] args) {
+        if (args.length < 4) {
+            throw new IllegalArgumentException("Pass obs ip address as 4th argument");
+        }
+        return args[3];
+    }
+
+    private static String getObsPassword(String[] args) {
+        if (args.length < 5) {
+            throw new IllegalArgumentException("Pass obs socket password as 5th argument");
+        }
+        return args[4];
     }
 
 }

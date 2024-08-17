@@ -12,11 +12,13 @@ public class OBSRewardListener implements EventListener {
     private final OBSRemoteController obsRemoteController;
     HashMap<String, OBSTask> rewardTasks;
     ExecutorService executorService;
+    private final BestGirlVotesDB bestGirlVotesDb;
 
-    public OBSRewardListener(OBSRemoteController obsRemoteController) {
+    public OBSRewardListener(OBSRemoteController obsRemoteController, BestGirlVotesDB bestGirlVotesDB) {
         rewardTasks = new HashMap<String, OBSTask>();
         this.obsRemoteController = obsRemoteController;
         executorService = new ForkJoinPool();
+        this.bestGirlVotesDb = bestGirlVotesDB;
         setupTasks();
     }
 
@@ -24,6 +26,8 @@ public class OBSRewardListener implements EventListener {
         rewardTasks.put(QuesoRewardTask.twitchRewardName, new QuesoRewardTask());
         rewardTasks.put(GiveUpRewardTask.twitchRewardName, new GiveUpRewardTask());
         rewardTasks.put("Gib meme", new GibMemeTask());
+        rewardTasks.put("Rei > Asuka", new BestGirlVoteReward("rei", bestGirlVotesDb));
+        rewardTasks.put("Asuka > Rei", new BestGirlVoteReward("asuka", bestGirlVotesDb));
     }
 
     @Override

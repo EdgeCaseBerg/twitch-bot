@@ -3,11 +3,14 @@ package space.peetseater.bot;
 import io.obswebsocket.community.client.OBSRemoteController;
 import io.obswebsocket.community.client.WebSocketCloseCode;
 import space.peetseater.bot.gui.ChatWindow;
+import space.peetseater.bot.rewards.BestGirlVotesDB;
 import space.peetseater.bot.rewards.OBSRewardListener;
 
 import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.function.Consumer;
 
@@ -19,9 +22,17 @@ public class Main {
         String ipAddress = getIpAddress(args);
         String obsPassword = getObsPassword(args);
 
+        BestGirlVotesDB bestGirlVotesDB = new BestGirlVotesDB();
+        Path bestGirlData = Paths.get("bestgirl.votes");
+        try {
+            bestGirlVotesDB.loadScore(bestGirlData);
+        } catch (NoSuchFileException noSuchFileException) {
+            System.out.println("Best girl db not created yet, suppressing no such file exception");
+        }
+
         OBSRemoteController obs = getObsRemoteController(ipAddress,obsPassword);
         obs.connect();
-        OBSRewardListener obsRewardListener = new OBSRewardListener(obs);
+        OBSRewardListener obsRewardListener = new OBSRewardListener(obs, bestGirlVotesDB);
 
         // Setup Twitch Connection
         TwitchEventPublisher twitchEventPublisher = new TwitchEventPublisher(clientId, clientSecret);
@@ -40,6 +51,12 @@ public class Main {
             public void run() {
                 twitchEventPublisher.disconnectFromTwitch();
                 obs.disconnect();
+                try {
+                    bestGirlVotesDB.saveScore(bestGirlData);
+                } catch (IOException e) {
+                    System.out.println("Could not save best girl votes!" + bestGirlVotesDB.toString());
+                    throw new RuntimeException(e);
+                }
             }
         });
     }

@@ -13,3 +13,6 @@ target/
 
 /.idea/*
 misc.xml
+
+clientid.txt
+clientsecret.txt

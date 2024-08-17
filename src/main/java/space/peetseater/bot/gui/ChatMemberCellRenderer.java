@@ -34,7 +34,6 @@ public class ChatMemberCellRenderer implements javax.swing.ListCellRenderer<Chat
         }
         colorIdx++;
         Color color = chatColors.get(colorIdx % chatColors.size());
-        System.out.println(color);
         chatMemberToColor.put(chatMessage.username(), color);
         return color;
     }

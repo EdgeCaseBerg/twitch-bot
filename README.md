@@ -26,6 +26,9 @@ in the current scene being displayed.
 - To get the name of the current scene, call the list endpoint and
 grab the property for the program window from that.
 - You have to enable the websocket plugin in OBS in settings!
+- Despite the twitch event api saying it returns fragments for messages
+to support emotes, the twitch4j message doesn't have this data. So I can't
+combine a label and imageicon together to display emotes in chat :(
 
 ### Running
 

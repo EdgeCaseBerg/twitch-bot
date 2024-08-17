@@ -9,7 +9,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.ForkJoinPool;
 
 public class OBSRewardListener implements EventListener {
-
     private final OBSRemoteController obsRemoteController;
     HashMap<String, OBSTask> rewardTasks;
     ExecutorService executorService;
@@ -22,7 +21,9 @@ public class OBSRewardListener implements EventListener {
     }
 
     private void setupTasks() {
-        // TODO
+        rewardTasks.put(QuesoRewardTask.twitchRewardName, new QuesoRewardTask());
+        rewardTasks.put(GiveUpRewardTask.twitchRewardName, new GiveUpRewardTask());
+        rewardTasks.put("Gib meme", new GibMemeTask());
     }
 
     @Override

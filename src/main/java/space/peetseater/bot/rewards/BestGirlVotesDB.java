@@ -33,12 +33,7 @@ public class BestGirlVotesDB {
         String perCharacterFormat = "%s||%d\n";
         // For the sake of testing sanity, save the characters in alphabetical order by name
         List<Map.Entry<String, Integer>> entries = new ArrayList<>(score.entrySet().stream().toList());
-        entries.sort(new Comparator<Map.Entry<String, Integer>>() {
-            @Override
-            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-                return o1.getKey().compareTo(o2.getKey());
-            }
-        });
+        entries.sort(Map.Entry.comparingByKey());
         Iterator<Map.Entry<String, Integer>> toSave = entries.iterator();
         StringBuilder stringBuilder = new StringBuilder();
         while (toSave.hasNext()) {

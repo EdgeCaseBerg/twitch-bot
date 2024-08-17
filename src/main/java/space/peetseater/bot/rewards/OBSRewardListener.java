@@ -15,7 +15,7 @@ public class OBSRewardListener implements EventListener {
     private final BestGirlVotesDB bestGirlVotesDb;
 
     public OBSRewardListener(OBSRemoteController obsRemoteController, BestGirlVotesDB bestGirlVotesDB) {
-        rewardTasks = new HashMap<String, OBSTask>();
+        rewardTasks = new HashMap<>();
         this.obsRemoteController = obsRemoteController;
         executorService = new ForkJoinPool();
         this.bestGirlVotesDb = bestGirlVotesDB;
@@ -40,12 +40,7 @@ public class OBSRewardListener implements EventListener {
         if (hasTaskFor(reward)) {
             OBSTask task = rewardTasks.get(reward);
             if (!task.isBusy()) {
-                executorService.submit(new Runnable() {
-                    @Override
-                    public void run() {
-                        task.run(obsRemoteController);
-                    }
-                });
+                executorService.submit(() -> task.run(obsRemoteController));
             }
         }
     }

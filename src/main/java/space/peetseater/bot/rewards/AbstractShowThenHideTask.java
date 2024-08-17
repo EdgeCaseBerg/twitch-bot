@@ -10,7 +10,8 @@ import org.slf4j.LoggerFactory;
 
 public abstract class AbstractShowThenHideTask implements OBSTask {
 
-    Logger logger = LoggerFactory.getLogger(getClass().getCanonicalName());
+    abstract protected Logger getLogger();
+
     protected boolean busy = false;
 
     abstract protected String getSceneItemName();
@@ -24,22 +25,22 @@ public abstract class AbstractShowThenHideTask implements OBSTask {
         }
         try {
             busy = true;
-            toggleQuesoVideoOnForDuration(obsRemoteController);
+            toggleSceneItemOnForDuration(obsRemoteController);
         } catch (Exception e) {
             // Ensure we
-            logger.error(e.getLocalizedMessage(), e);
+            getLogger().error(e.getLocalizedMessage(), e);
         }
         busy = false;
     }
 
-    private void toggleQuesoVideoOnForDuration(OBSRemoteController obsRemoteController) throws InterruptedException {
+    private void toggleSceneItemOnForDuration(OBSRemoteController obsRemoteController) throws InterruptedException {
         GetSceneListResponse sceneListResponse = obsRemoteController.getSceneList(1000);
         String sceneName = sceneListResponse.getCurrentProgramSceneName();
         GetSceneItemIdResponse sceneItemIdResponse = obsRemoteController.getSceneItemId(sceneName, getSceneItemName(), 0, 1000);
 
         // If there's no item by that name, then just stop
         if (!sceneItemIdResponse.getMessageData().getRequestStatus().getResult()) {
-            logger.warn("No item found in scene %s by name %s".formatted(sceneName, getSceneItemName()));
+            getLogger().warn("No item found in scene %s by name %s".formatted(sceneName, getSceneItemName()));
             return;
         }
 

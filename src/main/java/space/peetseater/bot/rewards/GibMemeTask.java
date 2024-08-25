@@ -10,6 +10,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class GibMemeTask implements OBSTask {
+    public static String twitchRewardName = "Gib meme";
     private final MemeFileSelector memeSelector;
     Logger logger = LoggerFactory.getLogger(getClass().getCanonicalName());
     private boolean busy;

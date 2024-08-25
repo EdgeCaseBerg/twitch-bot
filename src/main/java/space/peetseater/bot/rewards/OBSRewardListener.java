@@ -25,9 +25,9 @@ public class OBSRewardListener implements EventListener {
     private void setupTasks() {
         rewardTasks.put(QuesoRewardTask.twitchRewardName, new QuesoRewardTask());
         rewardTasks.put(GiveUpRewardTask.twitchRewardName, new GiveUpRewardTask());
-        rewardTasks.put("Gib meme", new GibMemeTask());
-        rewardTasks.put("Rei > Asuka", new BestGirlVoteReward("rei", bestGirlVotesDb));
-        rewardTasks.put("Asuka > Rei", new BestGirlVoteReward("asuka", bestGirlVotesDb));
+        rewardTasks.put(GibMemeTask.twitchRewardName, new GibMemeTask());
+        rewardTasks.put(BestGirlVoteReward.voteForReiAwardName, new BestGirlVoteReward("rei", bestGirlVotesDb));
+        rewardTasks.put(BestGirlVoteReward.voteForAsukaAwardName,  new BestGirlVoteReward("asuka", bestGirlVotesDb));
     }
 
     @Override

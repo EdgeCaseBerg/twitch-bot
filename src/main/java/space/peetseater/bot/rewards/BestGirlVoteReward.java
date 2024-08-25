@@ -10,6 +10,8 @@ import org.slf4j.LoggerFactory;
 
 public class BestGirlVoteReward implements OBSTask {
 
+    public static String voteForReiAwardName = "Rei > Asuka";
+    public static String voteForAsukaAwardName = "Asuka > Rei";
     Logger logger = LoggerFactory.getLogger(getClass().getCanonicalName());
 
     private final BestGirlVotesDB bestGirlVotesDB;

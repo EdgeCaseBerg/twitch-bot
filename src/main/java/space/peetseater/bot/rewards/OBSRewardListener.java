@@ -41,6 +41,11 @@ public class OBSRewardListener implements EventListener {
             OBSTask task = rewardTasks.get(reward);
             if (!task.isBusy()) {
                 executorService.submit(() -> task.run(obsRemoteController));
+            } else {
+                // For cases where votes come in before we've finished showing
+                // things like the best girl vote reward, we still want to count
+                // them
+                task.orRunIfBusy();
             }
         }
     }

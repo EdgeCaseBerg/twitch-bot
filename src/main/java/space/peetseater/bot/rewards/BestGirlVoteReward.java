@@ -37,6 +37,11 @@ public class BestGirlVoteReward implements OBSTask {
         busy = false;
     }
 
+    @Override
+    public void orRunIfBusy() {
+        bestGirlVotesDB.addVote(girl);
+    }
+
     private void updateObsTextForGirl(OBSRemoteController obsRemoteController) {
         String inputName = "%s-score".formatted(girl.toLowerCase());
         JsonObject updatedTextObject = new JsonObject();
